@@ -7,11 +7,13 @@ import Image from 'next/image';
 import axiosInstance from "@/helpers/axios";
 import { BASE_URL, API_VERSION } from "@/config";
 import { useRouter } from 'next/router';
+import useAuth from '@/contexts/auth.contexts';
 
 function ProfilePage() {
   const [selectedTab, setSelectedTab] = useState('portfolio');
   
-
+  const { user } = useAuth();
+  console.log(user);
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
   };
@@ -22,7 +24,7 @@ function ProfilePage() {
       const { user_id } = router.query;
     
     axiosInstance
-    .get(`${BASE_URL}/${API_VERSION}/user/profile/client/${user_id}`, {
+    .get(`${BASE_URL}/${API_VERSION}/user/profile/client/${user.id}`, {
     })
     .then((res) => {
       const data = res.data;
@@ -36,7 +38,7 @@ function ProfilePage() {
     });
 
   }
-},[router.isReady]);
+},[router.isReady, router.query, user.id]);
 
   const [activeComponent, setActiveComponent] = useState("Portfolio");
   return (
@@ -51,7 +53,7 @@ function ProfilePage() {
         <div className='pos-prof fl fl-gap31 '>
         
           <div>
-            <img src={userProfile?userProfile.avatar:'/profileicon.png'}  className='prof-img' alt="" width={86} height={88}/>
+            <Image src={userProfile?userProfile.avatar:'/profileicon.png'}  className='prof-img' alt="" width={86} height={88}/>
 
           </div>
            

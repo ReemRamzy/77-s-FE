@@ -49,9 +49,7 @@ const Contestbreif = () => {
         guaranteed: false, // the upcoming fields are intially added till update the form&req
         package: 1,
         round_one_finalists: [
-            4,
-            5,
-            6
+            11
           ],
         round_one_start_date: "2024-05-26T17:22:36Z",
         round_one_end_date: "2024-05-26T17:22:39Z",

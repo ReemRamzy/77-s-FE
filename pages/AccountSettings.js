@@ -1,132 +1,113 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import GeneralSettings from "@/components/AccountSettings/GeneralSettings";
-import MembershipSettings from '@/components/AccountSettings/MembershipSettings'
+import MembershipSettings from "@/components/AccountSettings/MembershipSettings";
 import IDVerificationSettings from "@/components/AccountSettings/IDVerificationSettings";
 import NotificationsSettings from "@/components/AccountSettings/NotificationsSettings";
 import ProfileSettings from "@/components/AccountSettings/ProfileSettings";
-import { useEffect } from "react";
 import { BASE_URL, API_VERSION } from "@/config";
 import Cookies from "js-cookie";
 import useAuth from "@/contexts/auth.contexts";
-import axiosInstance from "@/helpers/axios";
-import axios from "axios";
-import {user_client, user_info} from "@/app/Redux/Actions";
-import Swal from "sweetalert2";
-import {useDispatch, useSelector} from "react-redux";
-// import TimezoneSelect from 'react-timezone-select'
+import { useDispatch, useSelector } from "react-redux";
+import { user_client, user_info, refresh_Account } from "@/app/Redux/Actions";
 
 const AccountSettings = () => {
   const { user } = useAuth();
   const [activeComponent, setActiveComponent] = useState("General");
-  const user_c = useSelector((state)=>state.user_client)
-  const revo = useSelector((state)=>state.refresh_Account)
-  const csrfToken = Cookies.get("csrfToken");
-  const dispatch = useDispatch()
+  const user_c = useSelector((state) => state.user_client);
+  const revo = useSelector((state) => state.refresh_Account);
+  const csrfToken = Cookies.get("77SDESIGN_CSRF_TOKEN");
+  const dispatch = useDispatch();
+
+  const [userData, setUserData] = useState(null);
+  const [formData, setFormData] = useState({
+    general: {},
+    profile: {},
+    notifications: {},
+    idVerification: {},
+    membership: {},
+  });
+
   useEffect(() => {
-    // if (user.user_type !== "designer") {
-    //   window.location.href = "/AccountSettings";
-    // }
+    const getAccount = async () => {
+      const accessToken = localStorage.getItem('access_token');
+      if (accessToken) {
+        const response = await fetch(`${BASE_URL}/${API_VERSION}/user/profile/client/${user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+          credentials: 'include',
+        });
 
-    // axiosInstance(`${BASE_URL}/${API_VERSION}/user/csrf/`);
-    // fetch(`${BASE_URL}/${API_VERSION}/user/profile/client/5/`, {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "X-CSRFToken": csrfToken,
-    //   },
-    //   credentials: "include",
-    // })
-    //   .then((response) => {
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     console.log(data);
-    //   })
-    //   .catch((error) => console.error(error));
-    const getAccount=async ()=>{
-
-      await axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/profile/client/${user_c.user.id}`)
-          .then((res) => {
-            if (res.data.user){
-              console.log('profile designer',res.data)
-              dispatch(user_client(res.data))
-            }
-            else {
-
-
-              // Swal.fire({
-              //   title: 'Success',
-              //   text: `Logged In sucessfully \n Welcome ${res.data.user.username}`,
-              //   icon: 'success',
-              //   timer: 3000, // Time in milliseconds (2 seconds in this example)
-              //   showConfirmButton: false
-              // })
-
-              console.log(res.data);
-
-            }
-          })
-          .catch((error) => {
-            // console.error(error);setErrorr(true)
+        const data = await response.json();
+        if (data.user) {
+          dispatch(user_client(data));
+          setUserData(data);
+          setFormData({
+            general: data,
+            profile: data,
+            notifications: data,
+            idVerification: data,
+            membership: data,
           });
+        } else {
+          console.log("data fetched sucess");
+        }
+      }
+    };
 
-    }
-    getAccount()
+    getAccount();
+  }, [revo, user, dispatch, csrfToken]);
 
-  }, [revo]);
-
-
+  const handleFormDataChange = (tab, newData) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [tab]: {
+        ...prevData[tab],
+        ...newData,
+      },
+    }));
+  };
 
   return (
-    <div className="settings-container ">
+    <div className="settings-container">
       <div className="home_section mainscr">
-        <Navbar user />
+        <Navbar />
         <div className="max mt-133">
-          <div className="my-workkk  mb-46">
+          <div className="my-workkk mb-46">
             <h3 id="title">Account Settings</h3>
           </div>
 
           <div className="settings-nav">
             <button
-              className={` ${
-                activeComponent === "General" ? "active nav-btn" : "nav-btn"
-              }`}
+              className={` ${activeComponent === "General" ? "active nav-btn" : "nav-btn"}`}
               onClick={() => setActiveComponent("General")}
             >
               General
             </button>
             <button
-              className={`nav-btn ${
-                activeComponent === "Profile" ? "active" : ""
-              }`}
-              onClick={() => {
-                setActiveComponent("Profile");
-                console.log(activeComponent);
-              }}
+              className={`nav-btn ${activeComponent === "Profile" ? "active" : ""}`}
+              onClick={() => setActiveComponent("Profile")}
             >
               Profile
             </button>
             <button
-              className={`nav-btn ${
-                activeComponent === "Notifications" ? "active" : ""
-              }`}
+              className={`nav-btn ${activeComponent === "Notifications" ? "active" : ""}`}
               onClick={() => setActiveComponent("Notifications")}
             >
               Notifications
             </button>
             <button
-              className={`nav-btn ${
-                activeComponent === "ID Verification" ? "active" : ""
-              }`}
+              className={`nav-btn ${activeComponent === "ID Verification" ? "active" : ""}`}
               onClick={() => setActiveComponent("ID Verification")}
             >
               ID Verification
             </button>
             <button
-              className={`nav-btn ${
-                activeComponent === "Membership" ? "active" : ""
-              }`}
+              className={`nav-btn ${activeComponent === "Membership" ? "active" : ""}`}
               onClick={() => setActiveComponent("Membership")}
             >
               Membership
@@ -135,24 +116,13 @@ const AccountSettings = () => {
         </div>
       </div>
 
-      <div className=" mainscr h-60v ">
-        <div className="settings-content ">
-          {/* <input
-            type="file"
-            placeholder="Drag and drop to upload or click to browse to choose a file"
-            name="myImage"
-            className="inputfileupload"
-            onChange={(event) => {
-              console.log(event.target.files[0]);
-              setAvatar(event.target.files[0]);
-            }}
-          /> */}
-          {/* <button onClick={handleContinue}>Cont</button> */}
-          {activeComponent === "General" && <GeneralSettings  />}
-          {activeComponent === "Profile" && <ProfileSettings  />}
-          {activeComponent === "Notifications" && <NotificationsSettings   />}
-          {activeComponent === "ID Verification" && <IDVerificationSettings />}
-          {activeComponent === "Membership" && <MembershipSettings  />}
+      <div className="mainscr h-60v">
+        <div className="settings-content">
+          {activeComponent === "General" && <GeneralSettings data={formData.general} onDataChange={(newData) => handleFormDataChange("general", newData)} />}
+          {activeComponent === "Profile" && <ProfileSettings data={formData.profile} onDataChange={(newData) => handleFormDataChange("profile", newData)} />}
+          {activeComponent === "Notifications" && <NotificationsSettings data={formData.notifications} onDataChange={(newData) => handleFormDataChange("notifications", newData)} />}
+          {activeComponent === "ID Verification" && <IDVerificationSettings data={formData.idVerification} onDataChange={(newData) => handleFormDataChange("idVerification", newData)} />}
+          {activeComponent === "Membership" && <MembershipSettings data={formData.membership} onDataChange={(newData) => handleFormDataChange("membership", newData)} />}
         </div>
       </div>
       <Footer />
@@ -161,6 +131,3 @@ const AccountSettings = () => {
 };
 
 export default AccountSettings;
-
-
-// firstname,lastname,country,city,timezone,address,state,zip_code,phone,languages,bio,avatar, id_card,

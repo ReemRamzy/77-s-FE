@@ -70,6 +70,7 @@ const Navbar = () => {
   getUserdetail()
 
   }, []);
+
   const [showMenu, setShowMenu] = useState(true);
   const [showWorkMenu, setShowWorkMenu] = useState(true);
 
@@ -91,7 +92,7 @@ const Navbar = () => {
       title: 'Success',
       text:"logged out successfully",
       icon: 'success',
-      timer: 3000, // Time in milliseconds (2 seconds in this example)
+      timer: 3000, // Time in milliseconds // (2 seconds in this example)
       showConfirmButton: false
     })
     router.reload();

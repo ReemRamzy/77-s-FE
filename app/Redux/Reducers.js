@@ -90,8 +90,23 @@ const INITIAL_VALUE={
         "rating": 0
     }
 
-
+    
 }
+
+
+const rootReducer = (state = initialState, action) => {
+    switch (action.type) {
+      case 'USER_INFO':
+        return {
+          ...state,
+          user_info: action.payload,
+        };
+      default:
+        return state;
+    }
+  };
+
+
 export default function countryListReducer( state=INITIAL_VALUE,action){
     switch(action.type){
         case 'COUNTRY_LIST':
