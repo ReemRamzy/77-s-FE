@@ -61,7 +61,7 @@ const IDVerification = ({setId_card,handleContinue}) => {
         frmDta.append('user',user_infor.id)
         frmDta.append('id_number',idNumber)
 
-        await axiosInstance.post(`${BASE_URL}/${API_VERSION}/user/verify/`,frmDta,
+        await axiosInstance.post(`${API_VERSION}/user/verify/`,frmDta,
             {
                 headers: {
                     'Content-Type': 'multipart/form-data',

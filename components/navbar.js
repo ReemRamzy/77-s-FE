@@ -37,16 +37,14 @@ const Navbar = () => {
   // const [user_details, setUser_details] = useState(null);
   const  getUserdetail = async () =>{
     const accesso = await AsyncStorage.getItem('access_token')
-    console.log('accesso',accesso)
+    
     if(accesso!==null){
       if(!user_details.id){
-        console.log('no user detail')
         await axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/details`,{
           headers:{
             'Authorization':`Bearer ${accesso}`
           }
         }).then((res)=>{
-          console.log('res user detail', res.data)
           if(res.data.id){
             dispatch(user_info(res.data))
 

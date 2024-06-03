@@ -10,7 +10,7 @@ const Reviews = () => {
   return ( 
   <div className='mainscr  fl'>
 
-    <Image src='/comments.png' alt=''/>
+    <Image src={""} alt=''/>
   
   </div>
   )

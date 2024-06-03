@@ -53,7 +53,7 @@ function ProfilePage() {
         <div className='pos-prof fl fl-gap31 '>
         
           <div>
-            <Image src={userProfile?userProfile.avatar:'/profileicon.png'}  className='prof-img' alt="" width={86} height={88}/>
+            <Image src={""}  className='prof-img' alt="" width={86} height={88}/>
 
           </div>
            

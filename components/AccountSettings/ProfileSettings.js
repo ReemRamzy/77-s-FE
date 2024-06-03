@@ -9,88 +9,86 @@ import useAuth from "@/contexts/auth.contexts";
 const ProfileSettings = ({ data, onDataChange }) => {
   const authUser = useAuth(); // Access the authenticated user
   const [file, setFile] = useState(null);
-  const [Avatar, setAvatar] = useState('');
   const [imgChng, setImgChng] = useState('64');
-  const [Username, setUsername] = useState('');
-  const [Bio, setBio] = useState('');
-  const [Langs, setLangs] = useState("");
-  const [cPass, setcPass] = useState('');
-  const [nPass, setnPass] = useState('');
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
+
+  const [profileInfo, setProfileInfo] = useState({
+    avatar: "",
+    username: "",
+    bio: "",
+    languages: "",
+    currentPassword: "",
+    newPassword: ""
+  });
 
   useEffect(() => {
     if (data) {
-      setUsername(authUser?.username || data.user.username || ""); // Fetch username from auth or data object
-      setAvatar(data.avatar || "");
-      setBio(data.bio || "");
-      setLangs(data.languages || "");
+      setProfileInfo({
+        avatar: data.avatar || "",
+        username: authUser?.username || data.user.username || "",
+        bio: data.bio || "",
+        languages: data.languages || "",
+        currentPassword: "",
+        newPassword: ""
+      });
     }
   }, [data, authUser]);
 
-  const handleFileUpload = e => {
+  const handleOnChangeInput = (key, value) => {
+    const newProfileInfo = { ...profileInfo, [key]: value };
+    setProfileInfo(newProfileInfo);
+    onDataChange(newProfileInfo);
+  };
+
+  const handleFileUpload = (e) => {
     setFile(URL.createObjectURL(e.target.files[0]));
+    handleOnChangeInput("avatar", URL.createObjectURL(e.target.files[0]));
   };
 
-  const [randomData, setRandomData] = useState({ number: null, char: null });
-
-  const getRandomNumberAndChar = () => {
-    const randomNumber = Math.floor(Math.random() * 100) + 1;
-    const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
-    setRandomData({ number: randomNumber, char: randomChar });
-  };
-
-  const updateP = async () => {
+  const updateProfile = async () => {
     const frmData = new FormData();
-    const response = await fetch(Avatar);
+    const response = await fetch(profileInfo.avatar);
     const blob = await response.blob();
-    getRandomNumberAndChar();
+
     frmData.append('avatar', blob, 'image.jpeg');
-    frmData.append('languages', Langs);
-    frmData.append('bio', Bio);
-    frmData.append('username', Username); // Include username in the form data
+    frmData.append('languages', profileInfo.languages);
+    frmData.append('bio', profileInfo.bio);
+    frmData.append('username', profileInfo.username);
 
-    await axiosInstance.patch(`${BASE_URL}/${API_VERSION}/user/profile/client/${data.id}`, frmData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }).then((res) => {
-      dispatch(refresh_Account(randomData));
-      console.log(res.data);
-    }).catch((error) => { console.log(error); });
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      await axiosInstance.patch(`${BASE_URL}/${API_VERSION}/user/profile/client/${data.user.id}`, frmData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      }).then((res) => {
+        dispatch(refresh_Account());
+        console.log(res.data);
+      }).catch((error) => {
+        console.log(error.response.data);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const ChangeToDesigner = async () => {
-    const frmData = new FormData();
-    const response = await fetch(Avatar);
-    const blob = await response.blob();
-    getRandomNumberAndChar();
-    frmData.append('user_type', blob, 'designer');
-
-    await axiosInstance.patch(`${BASE_URL}/${API_VERSION}/user/profile/client/${data.id}`, frmData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }).then((res) => {
-      dispatch(refresh_Account(randomData));
-      console.log(res.data);
-    }).catch((error) => { console.log(error); });
-  };
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="form-group-sett m-40 mb-172">
       <div className="form-group1">
         <div className="profile__img-upload">
           <div className='img-up jst'>
-            {Avatar ?
+            {profileInfo.avatar ?
               <Image
                 className='uploadedImage'
                 alt="not found"
-                fill = {true}
-                src={imgChng === '64' ?
-                  `data:image/png;base64,${Avatar}`
-                  : Avatar
-                }
+                fill={true}
+                src={imgChng === '64' ? `data:image/png;base64,${profileInfo.avatar}` : profileInfo.avatar}
               />
               :
               <div style={{
@@ -107,12 +105,11 @@ const ProfileSettings = ({ data, onDataChange }) => {
 
             <input
               type="file"
-              placeholder=""
               name="myImage"
               className="inputfileupload2"
               onChange={(event) => {
                 setImgChng('46');
-                setAvatar(URL.createObjectURL(event.target.files[0]));
+                handleFileUpload(event);
               }}
             />
           </div>
@@ -120,21 +117,31 @@ const ProfileSettings = ({ data, onDataChange }) => {
         <div className="form-group w-100">
           <div>
             <label htmlFor="username">Username</label>
-            <input value={Username} type="text" id="Username" onChange={(e) => setUsername(e.target.value)} />
+            <input
+              value={profileInfo.username}
+              type="text"
+              id="username"
+              onChange={(e) => handleOnChangeInput('username', e.target.value)}
+            />
           </div>
           <div>
             <label htmlFor="languages">Languages</label>
             <input
-              onChange={(e) => setLangs(e.target.value)}
-              value={Langs} type="text" id="Languages" />
+              onChange={(e) => handleOnChangeInput('languages', e.target.value)}
+              value={profileInfo.languages}
+              type="text"
+              id="languages"
+            />
           </div>
         </div>
       </div>
       <div className="form-group">
         <label htmlFor="biography" className='mb-8'>Biography</label>
-        <textarea value={Bio}
-          onChange={(e) => setBio(e.target.value)}
-          id="Biography"></textarea>
+        <textarea
+          value={profileInfo.bio}
+          onChange={(e) => handleOnChangeInput('bio', e.target.value)}
+          id="biography"
+        ></textarea>
       </div>
       <div className='p-33'>
         <h1 id='nn'>Change Password:</h1>
@@ -142,25 +149,28 @@ const ProfileSettings = ({ data, onDataChange }) => {
           <div className="form-group w-40">
             <label htmlFor="passwordold">Current Password</label>
             <input
-              value={cPass}
-              onChange={(e) => setcPass(e.target.value)}
-              type="password" className="form-control" id="passwordold" />
+              value={profileInfo.currentPassword}
+              onChange={(e) => handleOnChangeInput('currentPassword', e.target.value)}
+              type="password"
+              className="form-control"
+              id="passwordold"
+            />
           </div>
           <div className="form-group w-40">
             <label htmlFor="passwordnew">New Password</label>
             <input
-              value={nPass}
-              onChange={(e) => setnPass(e.target.value)}
-              type="password" className="form-control" id="passwordnew" />
+              value={profileInfo.newPassword}
+              onChange={(e) => handleOnChangeInput('newPassword', e.target.value)}
+              type="password"
+              className="form-control"
+              id="passwordnew"
+            />
           </div>
         </div>
       </div>
 
       <div className="profile__About-button">
-        <button type='button' id='profile__About-button' onClick={ChangeToDesigner}>Convert To Designer</button>
-      </div>
-      <div className="profile__submit-button">
-        <button className={'btn'} type={'button'} onClick={updateP}>Submit</button>
+        <button type='button' id='profile__About-button' onClick={updateProfile}>Submit</button>
       </div>
     </div>
   );

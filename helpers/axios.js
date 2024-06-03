@@ -15,18 +15,13 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
     (config) => {
-      // Modify the request config here (add headers, authentication tokens)
       const accessToken = localStorage.getItem("access_token");
-        console.log(accessToken)
-      // If token is present add it to request's Authorization Header
       if (accessToken) {
         if (config.headers) config.headers.Authorization = "Bearer " + accessToken;
       }
       return config;
     },
     (error) => {
-      // Handle request errors here
-
       return Promise.reject(error);
     }
 );
@@ -66,7 +61,7 @@ axiosInstance.interceptors.response.use(
                 const tokenParts = JSON.parse(atob(refreshToken.split('.')[1]))
 
                 const now = Math.ceil(Date.now() / 1000)
-                console.log(tokenParts.exp)
+                // console.log(tokenParts.exp)
 
                 if (tokenParts.exp > now) {
                     return axiosInstance
@@ -104,6 +99,5 @@ axiosInstance.interceptors.response.use(
     }
 )
 
-// End of Response interceptor
 
 export default axiosInstance;

@@ -37,9 +37,9 @@ const GeneralSettings = ({ data, onDataChange }) => {
         zip_code: data.zip_code || "",
         phone: data.phone || "",
       });
-      setEmail(authUser?.email || data.user?.email || "");
+      setEmail( data.user?.email || "");
     }
-  }, [authUser, data]);
+  }, [data]);
 
   const handleOnChangeInput = (key, value) => {
     const newGInfo = { ...gInfo, [key]: value };
