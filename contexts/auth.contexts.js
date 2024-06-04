@@ -69,64 +69,106 @@
 // export default useAuth;
 
 
-"use client";
+// "use client";
 
-import axios from "axios";
-import { createContext, useContext, useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { API_VERSION, BASE_URL } from "@/config";
-import Cookies from "js-cookie";
-import { user_info } from "@/app/Redux/Actions";
+// import axios from "axios";
+// import { createContext, useContext, useState, useEffect } from "react";
+// import { useDispatch, useSelector } from "react-redux";
+// import { API_VERSION, BASE_URL } from "@/config";
+// import Cookies from "js-cookie";
+// import { user_info } from "@/app/Redux/Actions";
 
-export const AuthContext = createContext({
-  user: undefined,
-  setUser: async () => null,
-});
+// export const AuthContext = createContext({
+//   user: undefined,
+//   setUser: async () => null,
+// });
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(undefined);
-  const dispatch = useDispatch();
+// export const AuthProvider = ({ children }) => {
+//   const [user, setUser] = useState(undefined);
+//   const dispatch = useDispatch();
 
-  const storeUser = async () => {
-    const token = Cookies.get('access_token'); // Ensure token is correctly retrieved
-    const csrfToken = Cookies.get('77SDESIGN_CSRF_TOKEN');
+//   const storeUser = async () => {
+//     const token = Cookies.get('access_token'); // Ensure token is correctly retrieved
+//     const csrfToken = Cookies.get('77SDESIGN_CSRF_TOKEN');
     
-    if (token) {
-      try {
-        const response = await axios.get(`${BASE_URL}/${API_VERSION}/user/details/`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'X-CSRFToken': csrfToken,
-          },
-        });
-        dispatch(user_info(response.data)); // Dispatch the user info action
-      } catch (err) {
-        console.error('Error fetching user details:', err);
-        dispatch(user_info(undefined)); // Dispatch undefined on error
-      }
-    }
-  };
+//     if (token) {
+//       try {
+//         const response = await axios.get(`${BASE_URL}/${API_VERSION}/user/details/`, {
+//           headers: {
+//             'Authorization': `Bearer ${token}`,
+//             'X-CSRFToken': csrfToken,
+//           },
+//         });
+//         dispatch(user_info(response.data)); // Dispatch the user info action
+//       } catch (err) {
+//         console.error('Error fetching user details:', err);
+//         dispatch(user_info(undefined)); // Dispatch undefined on error
+//       }
+//     }
+//   };
 
-  useEffect(() => {
-    storeUser();
-  }, []);
+//   useEffect(() => {
+//     storeUser();
+//   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, setUser: storeUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+//   return (
+//     <AuthContext.Provider value={{ user, setUser: storeUser }}>
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
+
+// const useAuth = () => {
+//   const user = useSelector((state) => state.user_info);
+//   const dispatch = useDispatch();
+
+//   const setUserInRedux = (userData) => {
+//     dispatch(user_info(userData));
+//   };
+
+//   return { user, setUser: setUserInRedux };
+// };
+
+// export default useAuth;
+
+
+import { useState, useEffect } from 'react';
+import axiosInstance from '@/helpers/axios';
+import { BASE_URL, API_VERSION } from '@/config';
+import  AsyncStorage  from '@react-native-async-storage/async-storage';
 
 const useAuth = () => {
-  const user = useSelector((state) => state.user_info);
-  const dispatch = useDispatch();
+  const [authUser, setAuthUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
 
-  const setUserInRedux = (userData) => {
-    dispatch(user_info(userData));
-  };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const accesso = await AsyncStorage.getItem('access_token')
+      try {
+        const response = await axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/details`,{
+          headers:{
+            'Authorization':`Bearer ${accesso}`
+          }
+      });
+        setAuthUser(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        setLoading(false);
+      }
+    };
 
-  return { user, setUser: setUserInRedux };
+    // Call the fetchUserData function when the component mounts
+    fetchUserData();
+
+    // Clean up function (optional)
+    return () => {
+      // Perform any cleanup if needed
+    };
+  }, []);
+
+  return { authUser, loading };
 };
 
 export default useAuth;

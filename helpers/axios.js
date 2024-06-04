@@ -2,13 +2,14 @@ import axios from 'axios';
 import { API_VERSION, BASE_URL } from "@/config";
 import Cookies from "js-cookie";
 const csrfToken = Cookies.get('77SDESIGN_CSRF_TOKEN');
-
+const  accesso = Cookies.get('access');
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
     headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        'X-CSRFToken': csrfToken
+        'X-CSRFToken': csrfToken,
+        'Authorization': `Bearer ${accesso}`,
     },
 });
 

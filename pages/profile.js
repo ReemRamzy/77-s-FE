@@ -12,33 +12,27 @@ import useAuth from '@/contexts/auth.contexts';
 function ProfilePage() {
   const [selectedTab, setSelectedTab] = useState('portfolio');
   
-  const { user } = useAuth();
-  console.log(user);
+  const { authUser, loading } = useAuth();
+  console.log("profile get data " + authUser?.id);
+
+
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
   };
   const router = useRouter();
   const[userProfile,setUserProfile]=useState(null);
-  useEffect(() => {
-    if(router.isReady){
-      const { user_id } = router.query;
-    
-    axiosInstance
-    .get(`${BASE_URL}/${API_VERSION}/user/profile/client/${user.id}`, {
-    })
-    .then((res) => {
-      const data = res.data;
-      console.log('res:',res);
-      console.log('data:',data);
-      setUserProfile(data);
-    
-    })
-    .catch((err) => {
-      console.error(err);
-    });
 
+useEffect(() => {
+  if (authUser) {
+    axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/profile/client/${authUser?.id}`)
+      .then(response => {
+        setUserProfile(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
   }
-},[router.isReady, router.query, user.id]);
+}, [authUser]);
 
   const [activeComponent, setActiveComponent] = useState("Portfolio");
   return (

@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { user_info } from "@/app/Redux/Actions"; // Assuming user_info is an action for updating user information
 import axiosInstance from "@/helpers/axios";
 import { BASE_URL, API_VERSION } from "@/config";
+import TimezoneSelect from 'react-timezone-select';
 import useAuth from "@/contexts/auth.contexts";
 import ReactFlagsSelect from 'react-flags-select'; // Assuming you are using this library for country selection
 import PhoneInput from 'react-phone-input-2'; // Assuming you are using this library for phone input
 
-const GeneralSettings = ({ data, onDataChange }) => {
-  const authUser = useAuth();
-  const [Email, setEmail] = useState('');
-  const [error, setError] = useState(null);
-  const dispatch = useDispatch();
+const GeneralSettings = () => {
+  const { authUser, loading } = useAuth();
   const [gInfo, setGInfo] = useState({
     firstname: "",
     lastname: "",
@@ -25,47 +21,38 @@ const GeneralSettings = ({ data, onDataChange }) => {
   });
 
   useEffect(() => {
-    if (data) {
-      setGInfo({
-        firstname: data.firstname || "",
-        lastname: data.lastname || "",
-        country: data.country || "",
-        city: data.city || "",
-        timezone: data.timezone || "",
-        address: data.address || "",
-        state: data.state || "",
-        zip_code: data.zip_code || "",
-        phone: data.phone || "",
-      });
-      setEmail( data.user?.email || "");
+    if (authUser) {
+      axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/profile/client/${authUser?.id}`)
+        .then(response => {
+          setGInfo(response.data);
+        })
+        .catch(error => {
+          console.error('Error fetching user data:', error);
+        });
     }
-  }, [data]);
+  }, [authUser]);
 
   const handleOnChangeInput = (key, value) => {
-    const newGInfo = { ...gInfo, [key]: value };
-    setGInfo(newGInfo);
-    onDataChange(newGInfo);
+    setGInfo(prevState => ({
+      ...prevState,
+      [key]: value,
+    }));
   };
 
   const updateGeneralInfo = async () => {
     try {
-      const accessToken = localStorage.getItem('access_token');
-      await axiosInstance.patch(`${BASE_URL}/${API_VERSION}/user/profile/client/${data.user.id}`, gInfo, {
+      await axiosInstance.patch(`${BASE_URL}/${API_VERSION}/user/profile/client/${authUser?.id}`, gInfo, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
-      }).then((res) => {
-        dispatch(user_info(res.data));
-      }).catch((error) => {
-        console.log(error.response.data);
       });
     } catch (error) {
-      console.log(error);
+      console.error('Error updating user data:', error);
     }
   };
 
-  if (error) {
-    return <div>Error: {error}</div>;
+  if (loading || !authUser) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -73,7 +60,7 @@ const GeneralSettings = ({ data, onDataChange }) => {
       <form className="form-group-sett m-40 mb-172">
         <div className="form-group">
           <label htmlFor="email">Email</label>
-          <input type="email" value={Email} className="form-control" id="email" readOnly />
+          <input type="email" value={authUser.email} className="form-control" id="email" readOnly />
         </div>
 
         <div className="form-group1">
@@ -108,7 +95,10 @@ const GeneralSettings = ({ data, onDataChange }) => {
           </div>
           <div className="form-group w-30">
             <label htmlFor="timezone">Time Zone</label>
-            <input onChange={(e) => handleOnChangeInput('timezone', e.target.value)} value={gInfo.timezone} type="text" className="form-control" id="timezone" />
+            <TimezoneSelect
+              value={gInfo.timezone}
+              onChange={(timezone) => handleOnChangeInput('timezone', timezone)}
+            />
           </div>
         </div>
 

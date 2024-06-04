@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { refresh_Account } from "@/app/Redux/Actions";
 import axiosInstance from "@/helpers/axios";
 import { BASE_URL, API_VERSION } from "@/config";
 import Image from "next/image";
 import useAuth from "@/contexts/auth.contexts";
 
-const ProfileSettings = ({ data, onDataChange }) => {
-  const authUser = useAuth(); // Access the authenticated user
+const ProfileSettings = () => {
+  const { authUser, loading } = useAuth();
   const [file, setFile] = useState(null);
   const [imgChng, setImgChng] = useState('64');
   const [error, setError] = useState(null);
-  const dispatch = useDispatch();
 
   const [profileInfo, setProfileInfo] = useState({
     avatar: "",
@@ -23,59 +20,68 @@ const ProfileSettings = ({ data, onDataChange }) => {
   });
 
   useEffect(() => {
-    if (data) {
-      setProfileInfo({
-        avatar: data.avatar || "",
-        username: authUser?.username || data.user.username || "",
-        bio: data.bio || "",
-        languages: data.languages || "",
-        currentPassword: "",
-        newPassword: ""
-      });
+    if (authUser) {
+      axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/profile/client/${authUser.id}`)
+        .then(response => {
+          setProfileInfo({
+            ...response.data,
+            currentPassword: "",
+            newPassword: ""
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching user data:', error);
+        });
     }
-  }, [data, authUser]);
+  }, [authUser]);
 
   const handleOnChangeInput = (key, value) => {
-    const newProfileInfo = { ...profileInfo, [key]: value };
-    setProfileInfo(newProfileInfo);
-    onDataChange(newProfileInfo);
+    setProfileInfo(prevState => ({
+      ...prevState,
+      [key]: value,
+    }));
   };
 
   const handleFileUpload = (e) => {
-    setFile(URL.createObjectURL(e.target.files[0]));
-    handleOnChangeInput("avatar", URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    setFile(file);
+    setProfileInfo(prevState => ({
+      ...prevState,
+      avatar: URL.createObjectURL(file)
+    }));
+    setImgChng('46');
   };
 
-  const updateProfile = async () => {
+  const updateProfileInfo = async () => {
     const frmData = new FormData();
     const response = await fetch(profileInfo.avatar);
     const blob = await response.blob();
 
     frmData.append('avatar', blob, 'image.jpeg');
+    frmData.append('username', profileInfo.username);
     frmData.append('languages', profileInfo.languages);
     frmData.append('bio', profileInfo.bio);
-    frmData.append('username', profileInfo.username);
+    if (profileInfo.currentPassword) {
+      frmData.append('currentPassword', profileInfo.currentPassword);
+    }
+    if (profileInfo.newPassword) {
+      frmData.append('newPassword', profileInfo.newPassword);
+    }
 
     try {
-      const accessToken = localStorage.getItem('access_token');
-      await axiosInstance.patch(`${BASE_URL}/${API_VERSION}/user/profile/client/${data.user.id}`, frmData, {
+      await axiosInstance.patch(`${BASE_URL}/${API_VERSION}/user/profile/client/${authUser.id}`, frmData, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'multipart/form-data'
         },
-      }).then((res) => {
-        dispatch(refresh_Account());
-        console.log(res.data);
-      }).catch((error) => {
-        console.log(error.response.data);
       });
     } catch (error) {
-      console.log(error);
+      console.error('Error updating user data:', error);
     }
   };
 
-  if (error) {
-    return <div>Error: {error}</div>;
+  if (loading || !authUser) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -102,15 +108,11 @@ const ProfileSettings = ({ data, onDataChange }) => {
                 <span>200x200</span>
               </div>
             }
-
             <input
               type="file"
               name="myImage"
               className="inputfileupload2"
-              onChange={(event) => {
-                setImgChng('46');
-                handleFileUpload(event);
-              }}
+              onChange={(event) => handleFileUpload(event)}
             />
           </div>
         </div>
@@ -118,7 +120,7 @@ const ProfileSettings = ({ data, onDataChange }) => {
           <div>
             <label htmlFor="username">Username</label>
             <input
-              value={profileInfo.username}
+              value={authUser?.username}
               type="text"
               id="username"
               onChange={(e) => handleOnChangeInput('username', e.target.value)}
@@ -168,9 +170,8 @@ const ProfileSettings = ({ data, onDataChange }) => {
           </div>
         </div>
       </div>
-
       <div className="profile__About-button">
-        <button type='button' id='profile__About-button' onClick={updateProfile}>Submit</button>
+        <button type='button' id='profile__About-button' onClick={updateProfileInfo}>Submit</button>
       </div>
     </div>
   );

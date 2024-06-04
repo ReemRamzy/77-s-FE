@@ -18,66 +18,8 @@ import {useDispatch, useSelector} from "react-redux";
 // import TimezoneSelect from 'react-timezone-select'
 
 const AccountSettings = () => {
-  const { user } = useAuth();
+
   const [activeComponent, setActiveComponent] = useState("General");
-
-  const csrfToken = Cookies.get("csrfToken");
-  const dispatch = useDispatch()
-  const revo = useSelector((state)=>state.refresh_Account)
-
-  useEffect(() => {
-    // if (user.user_type !== "designer") {
-    //   window.location.href = "/AccountSettings";
-    // }
-
-    // axiosInstance(`${BASE_URL}/${API_VERSION}/user/csrf/`);
-    // fetch(`${BASE_URL}/${API_VERSION}/user/profile/client/5/`, {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     "X-CSRFToken": csrfToken,
-    //   },
-    //   credentials: "include",
-    // })
-    //   .then((response) => {
-    //     return response.json();
-    //   })
-    //   .then((data) => {
-    //     console.log(data);
-    //   })
-    //   .catch((error) => console.error(error));
-    const getAccount=async ()=>{
-
-    await axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/profile/designer/62`)
-        .then((res) => {
-          if (res.data.user){
-            console.log('profile designer',res.data.user.birth_date)
-            dispatch(user_designer(res.data))
-          }
-          else {
-
-
-            // Swal.fire({
-            //   title: 'Success',
-            //   text: `Logged In sucessfully \n Welcome ${res.data.user.username}`,
-            //   icon: 'success',
-            //   timer: 3000, // Time in milliseconds (2 seconds in this example)
-            //   showConfirmButton: false
-            // })
-
-            console.log(res.data);
-
-          }
-        })
-        .catch((error) => {
-          // console.error(error);setErrorr(true)
-        });
-
-    }
-getAccount()
-
-  }, [revo]);
-
-
 
   return (
     <div className="settings-container ">

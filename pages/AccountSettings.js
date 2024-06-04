@@ -13,54 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { user_client, user_info, refresh_Account } from "@/app/Redux/Actions";
 
 const AccountSettings = () => {
-  const { user } = useAuth();
   const [activeComponent, setActiveComponent] = useState("General");
-  const user_c = useSelector((state) => state.user_client);
-  const revo = useSelector((state) => state.refresh_Account);
-  const csrfToken = Cookies.get("77SDESIGN_CSRF_TOKEN");
-  const dispatch = useDispatch();
-
-  const [userData, setUserData] = useState(null);
-  const [formData, setFormData] = useState({
-    general: {},
-    profile: {},
-    notifications: {},
-    idVerification: {},
-    membership: {},
-  });
-
-  useEffect(() => {
-    const getAccount = async () => {
-      const accessToken = localStorage.getItem('access_token');
-      if (accessToken) {
-        const response = await fetch(`${BASE_URL}/${API_VERSION}/user/profile/client/${user.id}`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
-          },
-          credentials: 'include',
-        });
-
-        const data = await response.json();
-        if (data.user) {
-          dispatch(user_client(data));
-          setUserData(data);
-          setFormData({
-            general: data,
-            profile: data,
-            notifications: data,
-            idVerification: data,
-            membership: data,
-          });
-        } else {
-          console.log("data fetched sucess");
-        }
-      }
-    };
-
-    getAccount();
-  }, [revo, user, dispatch, csrfToken]);
 
   const handleFormDataChange = (tab, newData) => {
     setFormData((prevData) => ({
@@ -118,11 +71,11 @@ const AccountSettings = () => {
 
       <div className="mainscr h-60v">
         <div className="settings-content">
-          {activeComponent === "General" && <GeneralSettings data={formData.general} onDataChange={(newData) => handleFormDataChange("general", newData)} />}
-          {activeComponent === "Profile" && <ProfileSettings data={formData.profile} onDataChange={(newData) => handleFormDataChange("profile", newData)} />}
-          {activeComponent === "Notifications" && <NotificationsSettings data={formData.notifications} onDataChange={(newData) => handleFormDataChange("notifications", newData)} />}
-          {activeComponent === "ID Verification" && <IDVerificationSettings data={formData.idVerification} onDataChange={(newData) => handleFormDataChange("idVerification", newData)} />}
-          {activeComponent === "Membership" && <MembershipSettings data={formData.membership} onDataChange={(newData) => handleFormDataChange("membership", newData)} />}
+          {activeComponent === "General" && <GeneralSettings />}
+          {activeComponent === "Profile" && <ProfileSettings />}
+          {activeComponent === "Notifications" && <NotificationsSettings  />}
+          {activeComponent === "ID Verification" && <IDVerificationSettings  />}
+          {activeComponent === "Membership" && <MembershipSettings />}
         </div>
       </div>
       <Footer />

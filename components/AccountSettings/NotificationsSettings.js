@@ -42,7 +42,7 @@ const Notifications = ({setActiveComponent,payload}) => {
         </ul>
       </div>
       <div className='profile__submit-button'>
-        <button type="button" className="btn btn-primary" onClick={()=>{setActiveComponent("ID Verification");console.log(payload)}}>Continue</button>
+        <button type="button" className="btn btn-primary">Continue</button>
 
         </div>
     </div>

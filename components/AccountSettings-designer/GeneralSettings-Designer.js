@@ -6,64 +6,48 @@ import PhoneInput from 'react-phone-input-2'
 import {useSelector} from "react-redux";
 import axiosInstance from "@/helpers/axios";
 import {API_VERSION, BASE_URL} from "@/config";
+import useAuth from "@/contexts/auth.contexts";
 
 // import TimezoneSelect from 'react-timezone-select'
 
 
 const GeneralSettings2 = () => {
-  
+  const { authUser, loading } = useAuth();
+  console.log("the user is" + authUser?.name)
   const [selected, setSelected] = useState("EG");
   const [value, setValue] = useState()
-  const [selectedTimezone, setSelectedTimezone] =useState(
-    Intl.DateTimeFormat().resolvedOptions().timeZone
-  )
-  console.log(selectedTimezone)
-    const user_designer = useSelector((state)=>state.user_designer)
+  
+
+
+  // "sample_designs": []
+
     const [gInfo,setgInfo]= useState(
         {
-        "id": 44,
-            "user": {
-            "id": 62,
-                "email": "",
-                "username": "",
-                "user_type": "designer",
-                "is_verified": false,
-                "date_joined": "2024-01-11T20:08:42.562738Z",
-                "profile_completed": true
-        },
-        "sample_designs": [],
-            "firstname": "",
-            "lastname": "",
-            "country": "",
-            "city": "",
-            "timezone": "",
-            "address": "",
-            "state": "",
-            "zip_code": "",
-            "phone": "",
-            "languages": "",
-            "bio": "",
-            "avatar": null,
-            "id_card": null,
-            "gender": "",
-            "birth_date": "2024-01-11",
-            "available": true,
-            "notify": true,
-            "email_comments_messages": false,
-            "email_remind_deadlines": false,
-            "email_winner": false,
-            "level": "Entry",
-            "rating": "0.0"
-    }
-    )
-    useEffect(() => {
-        // const hasKeys = Object.keys(user_designer).length > 0;
-        console.log(user_designer)
-        if(user_designer){
+            firstname: "",
+            lastname: "",
+            country: "",
+            city: "",
+            timezone: "",
+            address: "",
+            state: "",
+            zip_code: "",
+            phone: "",
+            gender: "",
+            birth_date: "",
+            phone: "",
+    });
 
-        setgInfo(user_designer)
-        }
-    }, [user_designer]);
+    useEffect(() => {
+      if (authUser) {
+        axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/profile/designer/${authUser?.id}`)
+          .then(response => {
+            setgInfo(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching user data:', error);
+          });
+      }
+    }, [authUser]);
 
   const handleOnChangeInput= (key, value) => {
           setgInfo(prevState => ({
@@ -73,31 +57,29 @@ const GeneralSettings2 = () => {
 
   }
   const updateG =async ()=>{
-      await axiosInstance.patch(`${BASE_URL}/${API_VERSION}/user/profile/designer/${gInfo.user.id}`,{
-          "firstname": gInfo.firstname,
-          "lastname": gInfo.lastname,
-          "country": gInfo.country,
-          "city": gInfo.city,
-          "timezone": gInfo.timezone,
-          "address": gInfo.address,
-          "state": gInfo.state,
-          "zip_code": gInfo.zip_code,
-          "phone": gInfo.phone,
-          "gender": gInfo.gender,
-          "birth_date": gInfo.birth_date,
+    try {
+      await axiosInstance.patch(`${BASE_URL}/${API_VERSION}/user/profile/designer/${authUser?.id}`, gInfo, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      });
+    } catch (error) {
+      console.error('Error updating user data:', error);
+    }
+  };
 
-      }).then((res)=>{
-console.log(res.data)
-      })
-    .catch((error) => {console.log(error.response.data)});
+
+  if (loading || !authUser) {
+    return <div>Loading...</div>;
   }
+
   return (
     <div>
       <form className="form-group-sett m-40 mb-172">
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
-              type="email" value={gInfo.user.email} className="form-control" id="name" />
+              type="email" value={authUser?.email} className="form-control" id="name" />
         </div>
         
         <div className='form-group1'> 

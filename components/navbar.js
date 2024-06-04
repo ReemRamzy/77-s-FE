@@ -69,6 +69,8 @@ const Navbar = () => {
 
   }, []);
 
+console.log(user_details)
+
   const [showMenu, setShowMenu] = useState(true);
   const [showWorkMenu, setShowWorkMenu] = useState(true);
 
