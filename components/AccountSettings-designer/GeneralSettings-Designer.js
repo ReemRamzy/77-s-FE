@@ -25,15 +25,16 @@ const GeneralSettings2 = () => {
 
     useEffect(() => {
         if (authUser) {
-            // Try fetching designer profile
+            
             axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/profile/designer/${authUser.id}`)
                 .then(response => {
                     setGInfo(response.data);
                 })
                 .catch(error => {
+
                     if (error.response.status === 404) {
-                        // Designer profile not found, create one
-                        axiosInstance.post(`${BASE_URL}/${API_VERSION}/user/profile/designer/`, {
+
+                      axiosInstance.post(`${BASE_URL}/${API_VERSION}/user/profile/designer/`, {
                             user: authUser.id,
                             firstname: "",
                             lastname: "",

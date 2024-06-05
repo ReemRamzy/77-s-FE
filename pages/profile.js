@@ -13,26 +13,36 @@ function ProfilePage() {
   const [selectedTab, setSelectedTab] = useState('portfolio');
   
   const { authUser, loading } = useAuth();
-  console.log("profile get data " + authUser?.id);
+  console.log("profile get data " + authUser?.user_type);
 
 
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
   };
   const router = useRouter();
+  
   const[userProfile,setUserProfile]=useState(null);
-
-useEffect(() => {
-  if (authUser) {
-    axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/profile/client/${authUser?.id}`)
-      .then(response => {
-        setUserProfile(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching user data:', error);
-      });
-  }
-}, [authUser]);
+  
+  useEffect(() => {
+    if (authUser) {
+      let endpoint = '';
+      if (authUser.user_type === 'client') {
+        endpoint = `${BASE_URL}/${API_VERSION}/user/profile/client/${authUser.id}`;
+      } else if (authUser.user_type === 'designer') {
+        endpoint = `${BASE_URL}/${API_VERSION}/user/profile/designer/${authUser.id}`;
+      }
+  
+      if (endpoint) {
+        axiosInstance.get(endpoint)
+          .then(response => {
+            setUserProfile(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching user data:', error);
+          });
+      }
+    }
+  }, [authUser]);
 
   const [activeComponent, setActiveComponent] = useState("Portfolio");
   return (
@@ -47,7 +57,7 @@ useEffect(() => {
         <div className='pos-prof fl fl-gap31 '>
         
           <div>
-            <Image src={""}  className='prof-img' alt="" width={86} height={88}/>
+            <Image src={ `data:image/png;base64,${userProfile?.avatar}` } className='prof-img' alt="" width={86} height={88}/>
 
           </div>
            

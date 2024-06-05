@@ -8,8 +8,43 @@ import {Contacts, designerLevel, industries, Languages, lastActivity, Logoidenti
 import Designerswork from "@/components/designerswork";
 import { useEffect } from "react";
 import DesignersCard from "@/components/DesignersCard";
+import { Rating } from 'react-simple-star-rating'
+import axios from "axios";
+import { BASE_URL, API_VERSION } from "@/config";
+import axiosInstance from "@/helpers/axios";
+
 
 const Designers = ()=>{
+
+const [designersList , setDesignersList ] = useState([]);
+
+
+useEffect(() => {
+    const fetchDesigners = async () => {
+      try {
+        const response = await axiosInstance.get(`${BASE_URL}/${API_VERSION}/user/profile/designer/`);
+        setDesignersList(response.data.results);
+      } catch (error) {
+        console.error("Error fetching designers:", error);
+      }
+    };
+
+    fetchDesigners();
+
+}, []);
+
+
+console.log("the designers list is " + designersList);
+
+
+
+
+
+
+
+
+
+
 
     const [Indst, setIndst] = useState(industries.slice(0,6));
     function handleShowMore(){
@@ -295,13 +330,43 @@ const Designers = ()=>{
             </div>
             <div className="flwrap2  w-70 ">
             {/* <Image src="/image8.svg" width={742} height={191} /> */}
-            
-            {listnew.map((item) => (
+            {/* browse designers */}
+            {/* {listnew.map((item) => (
                     
                     <DesignersCard key={item.id} />
                 
-                        ))} 
-             
+                        ))}  */}
+
+
+        <div className='DesignersCard'>
+                <div className='DesignersCard_header'>
+
+                </div>
+                <div className='DesignersCard_body'>
+                    <div className='fl gap5 ali-cen'>
+                    <Image src="cat2logo4.svg" alt="" width={32} height={32}/>
+                    <h3>Designer name</h3>
+                    </div>
+                    <div className='fl jst-SB ali-cen mt-6' style={{fontSize:"10px",color:"#5A5A64"}}>
+                    <p style={{background: "#F5F7FA",padding:"2px 5px"}}>Adv. Level</p>
+                    <p>Online 7 hours ago</p>
+                    </div>
+                    <Rating size={34} className='mt-12' />
+                    <div className='DesignersCard_bio'>
+
+                    </div>
+                    <div className='fl gap5 jst-SB ali-cen mt-8' >
+                        <button className='Portfolio'>Portfolio</button>
+                        <button className='favorite'>favorite <Image src="heart2.svg" width={16} height={14} alt="" /> </button>
+                    
+                    </div>
+                    <div className='mt-23'>
+                        <button className='inv_btn'>Invite</button>
+                    </div>
+                </div>
+
+        </div>
+                    
             </div>
             </div>
             <div className="design-page-btns">
