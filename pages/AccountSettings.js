@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import GeneralSettings from "@/components/AccountSettings/GeneralSettings";
@@ -6,24 +6,9 @@ import MembershipSettings from "@/components/AccountSettings/MembershipSettings"
 import IDVerificationSettings from "@/components/AccountSettings/IDVerificationSettings";
 import NotificationsSettings from "@/components/AccountSettings/NotificationsSettings";
 import ProfileSettings from "@/components/AccountSettings/ProfileSettings";
-import { BASE_URL, API_VERSION } from "@/config";
-import Cookies from "js-cookie";
-import useAuth from "@/contexts/auth.contexts";
-import { useDispatch, useSelector } from "react-redux";
-import { user_client, user_info, refresh_Account } from "@/app/Redux/Actions";
 
 const AccountSettings = () => {
   const [activeComponent, setActiveComponent] = useState("General");
-
-  const handleFormDataChange = (tab, newData) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [tab]: {
-        ...prevData[tab],
-        ...newData,
-      },
-    }));
-  };
 
   return (
     <div className="settings-container">

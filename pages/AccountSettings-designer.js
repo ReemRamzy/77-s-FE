@@ -6,16 +6,6 @@ import ExperSettings from "@/components/AccountSettings-designer/exp-settings";
 import IDVerificationSettings2 from "@/components/AccountSettings-designer/IDVerificationSettings-Designer";
 import NotificationsSettings from "@/components/AccountSettings-designer/NotificationsSettings-Designer";
 import ProfileSettings from "@/components/AccountSettings-designer/ProfileSettings-Designer";
-import { useEffect } from "react";
-import { BASE_URL, API_VERSION } from "@/config";
-import Cookies from "js-cookie";
-import useAuth from "@/contexts/auth.contexts";
-import axiosInstance from "@/helpers/axios";
-import axios from "axios";
-import {user_designer, user_info} from "@/app/Redux/Actions";
-import Swal from "sweetalert2";
-import {useDispatch, useSelector} from "react-redux";
-// import TimezoneSelect from 'react-timezone-select'
 
 const AccountSettings = () => {
 

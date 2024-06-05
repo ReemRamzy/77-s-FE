@@ -40,7 +40,7 @@ const IDVerification = ({setId_card,handleContinue}) => {
                 title: 'error',
                 text: 'Please Choose a valid image',
                 icon: 'error',
-                timer: 1000, // Time in milliseconds (2 seconds in this example)
+                timer: 1000,
                 showConfirmButton: true
             })
             return
@@ -50,7 +50,7 @@ const IDVerification = ({setId_card,handleContinue}) => {
                 title: 'error',
                 text: 'Please input a valid Id Number',
                 icon: 'error',
-                timer: 1000, // Time in milliseconds (2 seconds in this example)
+                timer: 1000,
                 showConfirmButton: true
             })
             return
@@ -72,16 +72,14 @@ const IDVerification = ({setId_card,handleContinue}) => {
                 title: 'Success',
                 text: 'Your Verification Information Submitted \n Successfully',
                 icon: 'success',
-                timer: 3000, // Time in milliseconds (2 seconds in this example)
+                timer: 3000,
                 showConfirmButton: true
             }).then(()=>{
                 router.reload()
             })
-            console.log(res.data)
-
 
         }).catch((res)=>{
-            console.log(res)
+            
         })
     }
 
@@ -131,7 +129,6 @@ const IDVerification = ({setId_card,handleContinue}) => {
                                     setFile(`data:image/png;base64,${URL.createObjectURL(event.target.files[0])}`)
                                     handleImageChange(event)
                                     setFile(event.target.files[0])
-                                    // console.log(URL.createObjectURL(event.target.files[0]));
 
                                 }}
                             />

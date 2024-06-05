@@ -8,60 +8,6 @@ import {user_info} from "@/app/Redux/Actions";
  import {useRouter} from "next/router";
 
 const IDVerification = () => {
-//   const [file, setFile] = useState("idver.svg")
-//
-//   const [file2, setFile2] = useState("idver2.svg")
-//   const [status, setStatus] = useState('Pending Verification')
-//   const [result, setResult] = useState(null)
-//
-//   const handleFileUpload = e => {
-//     setFile(URL.createObjectURL(e.target.files[0]))
-//   }
-//
-//   return (
-//     <div className="form-group-sett m-40 mb-172">
-//       <div className='idtxt'>
-//         <p>77S-design is a professional marketplace and it’s important for us to confirm the identities of our users in order to maintain a trusted environment.</p>
-//         <p>Verifying your ID helps to secure your accounts and payments.At certain moments you will be required to verify your ID to progress to the next step.</p>
-//         <p>Once you started the verification process, you can check your status here.</p>
-//       </div>
-//       <div className='idimg fl-all3 mt-100 mb-45'>
-//       <div className='submitID'>
-//         <div className='idimg2 ' >
-//         <Image src={file} alt='ID Document Preview' width={235} height={180} />
-//         <input type='file' onChange={handleFileUpload} id="imgup" />
-//         </div>
-//         <p>Submit your ID</p>
-//         </div>
-//         <div className='submitID'>
-//         <div className='idimg2'>
-//         <Image src={file2} alt='ID Document Preview' width={235} height={180} />
-//         <input type='file' onChange={handleFileUpload} id="imgup" />
-//         </div>
-//         <p>Submit selfie</p>
-//         </div>
-//
-//         {file!="idver.svg" && (
-//           <div>
-//
-//             <p>Document Status: {status}</p>
-//             <p>Submission Date: {new Date().toLocaleDateString()}</p>
-//             {result && <p>Verification Result: {result}</p>}
-//           </div>
-//         )}
-//       </div>
-//       <div className="form-group w-40 jend">
-//                 <label htmlFor="last-name">ID number </label>
-//                 <input type="password" className="form-control" id="passwordnew" />
-//         </div>
-//       <div className="profile__submit-button mt-60">
-//         <button>Submit</button>
-//       </div>
-//     </div>
-//   )
-// }
-
-
     const [fileu, setFile] = useState("idver.svg")
     const [status, setStatus] = useState('Pending Verification')
     const [result, setResult] = useState(null)
@@ -95,7 +41,7 @@ const IDVerification = () => {
                 title: 'error',
                 text: 'Please Choose a valid image',
                 icon: 'error',
-                timer: 1000, // Time in milliseconds (2 seconds in this example)
+                timer: 1000,
                 showConfirmButton: true
             })
             return
@@ -105,7 +51,7 @@ const IDVerification = () => {
                 title: 'error',
                 text: 'Please input a valid Id Number',
                 icon: 'error',
-                timer: 1000, // Time in milliseconds (2 seconds in this example)
+                timer: 1000,
                 showConfirmButton: true
             })
             return
@@ -127,7 +73,7 @@ const IDVerification = () => {
                 title: 'Success',
                 text: 'Your Verification Information Submitted \n Successfully',
                 icon: 'success',
-                timer: 3000, // Time in milliseconds (2 seconds in this example)
+                timer: 3000,
                 showConfirmButton: true
             }).then(()=>{
                router.reload()
@@ -186,7 +132,6 @@ const IDVerification = () => {
                                     setFile(`data:image/png;base64,${URL.createObjectURL(event.target.files[0])}`)
                                     handleImageChange(event)
                                     setFile(event.target.files[0])
-                                    // console.log(URL.createObjectURL(event.target.files[0]));
 
                                 }}
                             />

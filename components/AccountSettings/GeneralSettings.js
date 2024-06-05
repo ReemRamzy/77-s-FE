@@ -3,8 +3,8 @@ import axiosInstance from "@/helpers/axios";
 import { BASE_URL, API_VERSION } from "@/config";
 import TimezoneSelect from 'react-timezone-select';
 import useAuth from "@/contexts/auth.contexts";
-import ReactFlagsSelect from 'react-flags-select'; // Assuming you are using this library for country selection
-import PhoneInput from 'react-phone-input-2'; // Assuming you are using this library for phone input
+import ReactFlagsSelect from 'react-flags-select';
+import PhoneInput from 'react-phone-input-2';
 
 const GeneralSettings = () => {
   const { authUser, loading } = useAuth();

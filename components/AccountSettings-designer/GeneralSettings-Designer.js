@@ -19,7 +19,7 @@ const GeneralSettings2 = () => {
         phone: "",
         gender: "",
         birth_date: "",
-        rating: 0,  // Assuming rating is part of designer profile
+        rating: 0,  
         sample_designs: []
     });
 
